@@ -1,4 +1,5 @@
-import { useContext, useState } from 'react';
+import axios from 'axios';
+import React, { useContext, useState } from 'react';
 import CartContext from '../../store/cart-context';
 import Modal from '../UI/Modal';
 import classes from './Cart.module.css';
@@ -7,6 +8,7 @@ import CheckOut from './CheckOut';
 
 const Cart = (props) => {
   const [isCheckOut, setIsCheckOut] = useState(false);
+  const [didSubmit, setDidSubmit] = useState(false);
   const cartCtx = useContext(CartContext);
   const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`;
   const hasItem = cartCtx.item.length > 0;
@@ -18,6 +20,7 @@ const Cart = (props) => {
   };
 
   const onCheckOut = () => {
+    setDidSubmit(false);
     setIsCheckOut(true);
   };
   const cartItem = (
@@ -39,8 +42,22 @@ const Cart = (props) => {
     </ul>
   );
 
-  return (
-    <Modal className={classes.total} onClick={props.onHideCar}>
+  const onSubmitOrder = async (userData) => {
+    await axios.post(
+      'https://react-app-12e8f-default-rtdb.asia-southeast1.firebasedatabase.app/order.json',
+      {
+        user: userData,
+        orderItems: cartCtx.item,
+        totalAmount: cartCtx.totalAmount,
+      }
+    );
+
+    setDidSubmit(true);
+    cartCtx.clearCart();
+  };
+
+  const cartModalItems = (
+    <React.Fragment>
       <div>
         {cartItem}
         <div className={classes.total}>
@@ -48,7 +65,6 @@ const Cart = (props) => {
           <span>{totalAmount}</span>
         </div>
       </div>
-      {isCheckOut && <CheckOut onClick={props.onHideCar} />}
       {!isCheckOut && (
         <div className={classes.actions}>
           <button className={classes['button--alt']} onClick={props.onHideCar}>
@@ -61,6 +77,27 @@ const Cart = (props) => {
           )}
         </div>
       )}
+      {isCheckOut && (
+        <CheckOut onSubmitOrder={onSubmitOrder} onClick={props.onHideCar} />
+      )}
+    </React.Fragment>
+  );
+
+  const didSubmitHandler = (
+    <React.Fragment>
+      <p>Order successful! 🎉🎉🎉</p>
+      <div className={classes.actions}>
+        <button className={classes['button--alt']} onClick={props.onHideCar}>
+          Close
+        </button>
+      </div>
+    </React.Fragment>
+  );
+
+  return (
+    <Modal className={classes.total} onClick={props.onHideCar}>
+      {!didSubmit && cartModalItems}
+      {didSubmit && didSubmitHandler}
     </Modal>
   );
 };

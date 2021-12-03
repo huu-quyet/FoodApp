@@ -7,7 +7,7 @@ const defaultInput = {
 
 const useReducerInput = (state, action) => {
   if (action.type === 'INPUT') {
-    return { value: action.value, isTouched: false };
+    return { value: action.value, isTouched: true };
   }
 
   if (action.type === 'BLUR') {

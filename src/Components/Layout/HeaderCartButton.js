@@ -31,7 +31,7 @@ const HeaderCartButton = (props) => {
         <span className={styles.icon}>
           <CartIcon />
         </span>
-        <span>Your Car</span>
+        <span>Your Cart</span>
         <span className={styles.badge}>{numberCartItem}</span>
       </button>
     </React.Fragment>

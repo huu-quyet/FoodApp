@@ -15,8 +15,6 @@ const MealsList = () => {
         'https://react-app-12e8f-default-rtdb.asia-southeast1.firebasedatabase.app/meals.json'
       );
 
-      console.log(meals);
-
       if (!meals.statusText === 'OK') {
         throw new Error('Something went wrong!');
       }

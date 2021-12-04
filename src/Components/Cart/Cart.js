@@ -8,6 +8,7 @@ import CheckOut from './CheckOut';
 
 const Cart = (props) => {
   const [isCheckOut, setIsCheckOut] = useState(false);
+  const [confirmError, setConfirmError] = useState();
   const [didSubmit, setDidSubmit] = useState(false);
   const cartCtx = useContext(CartContext);
   const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`;
@@ -43,22 +44,36 @@ const Cart = (props) => {
   );
 
   const onSubmitOrder = async (userData) => {
-    await axios.post(
-      'https://react-app-12e8f-default-rtdb.asia-southeast1.firebasedatabase.app/order.json',
-      {
-        user: userData,
-        orderItems: cartCtx.item,
-        totalAmount: cartCtx.totalAmount,
-      }
-    );
+    try {
+      const response = await axios.post(
+        'https://react-app-12e8f-default-rtdb.asia-southeast1.firebasedatabase.app/order.json',
+        {
+          user: userData,
+          orderItems: cartCtx.item,
+          totalAmount: cartCtx.totalAmount,
+        }
+      );
 
-    setDidSubmit(true);
-    cartCtx.clearCart();
+      if (response.statusText !== 'OK') {
+        throw new Error('Something went wrong!');
+      }
+      setConfirmError();
+      setDidSubmit(true);
+      cartCtx.clearCart();
+    } catch (error) {
+      setConfirmError(error.message);
+      setDidSubmit(false);
+    }
   };
 
   const cartModalItems = (
     <React.Fragment>
       <div>
+        {confirmError ? (
+          <p className={classes.error}>{confirmError}💥💥💥. Try again!</p>
+        ) : (
+          ''
+        )}
         {cartItem}
         <div className={classes.total}>
           <span>Total Amount</span>

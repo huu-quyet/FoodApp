@@ -50,8 +50,6 @@ const cartReducer = (state, action) => {
     let updateItems;
 
     if (existingCartItem) {
-      console.log(existingCartItem);
-      console.log(action);
       const updateItem = {
         ...existingCartItem,
         amount: existingCartItem.amount - 1,
